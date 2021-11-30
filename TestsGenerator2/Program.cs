@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using TestsGeneratorLib;
 
@@ -17,6 +18,20 @@ namespace TestsGenerator2
                 blockOptions
             );
 
+            TransformManyBlock<string, TestUnit> createTestsBlock = new TransformManyBlock<string, TestUnit>
+            (
+            async sourceCode => await Task.Run(() => generator.CreateTests(sourceCode).ToArray()),
+             blockOptions
+            );
+
+
+            ActionBlock<TestUnit> saveTestsBlock = new ActionBlock<TestUnit>
+            (
+                async testsFile =>
+                    await File.WriteAllTextAsync("..\\..\\..\\..\\GeneratedTests\\" + testsFile.FileName,
+                        testsFile.SourceCode),
+                blockOptions
+            );
 
         }
     }
