@@ -10,7 +10,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace TestsGeneratorLib
 {
-    class Generator
+    public class Generator
     {
         public List<TestUnit> CreateTests(string source)
         {
@@ -36,13 +36,19 @@ namespace TestsGeneratorLib
 
         private ClassDeclarationSyntax CreateTestClass(string className)
         {
-           
+            AttributeSyntax attribute = Attribute(ParseName("TestClass"));
+            return ClassDeclaration(className + "Test")
+                .AddModifiers(Token(SyntaxKind.PublicKeyword))
+                .AddAttributeLists(AttributeList().AddAttributes(attribute));
         }
 
 
         private MethodDeclarationSyntax CreateTestMethod(string methodName)
         {
-          
+            AttributeSyntax attribute = Attribute(ParseName("TestMethod"));
+            return MethodDeclaration(ParseTypeName("void"), methodName + "Test")
+                .AddModifiers(Token(SyntaxKind.PublicKeyword)).AddBodyStatements(EmptyTestSyntax())
+                .AddAttributeLists(AttributeList().AddAttributes(attribute));
         }
 
         private StatementSyntax[] EmptyTestSyntax()
