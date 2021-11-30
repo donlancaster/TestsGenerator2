@@ -29,7 +29,7 @@ namespace TestsGenerator2
             (
                 async testsFile =>
                     await File.WriteAllTextAsync("..\\..\\..\\..\\GeneratedTests\\" + testsFile.FileName,
-                        testsFile.SourceCode),
+                        testsFile.Source),
                 blockOptions
             );
 
