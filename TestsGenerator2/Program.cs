@@ -33,6 +33,20 @@ namespace TestsGenerator2
                 blockOptions
             );
 
+            DataflowLinkOptions linkOptions = new DataflowLinkOptions { PropagateCompletion = true };
+            readFilesBlock.LinkTo(createTestsBlock, linkOptions);
+            createTestsBlock.LinkTo(saveTestsBlock, linkOptions);
+
+            string[] filePaths = Directory.GetFiles("..\\..\\..\\..\\Files\\");
+
+            foreach (string filePath in filePaths)
+            {
+                if (filePath.EndsWith(".cs"))
+                    readFilesBlock.Post(filePath);
+            }
+
+            readFilesBlock.Complete();
+            saveTestsBlock.Completion.Wait();
         }
     }
 }
