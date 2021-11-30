@@ -3,8 +3,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -15,7 +13,22 @@ namespace TestsGeneratorLib
         public List<TestUnit> CreateTests(string source)
         {
             List<TestUnit> list = new List<TestUnit>();
+            SyntaxNode root = CSharpSyntaxTree.ParseText(source).GetRoot();
+            foreach (ClassDeclarationSyntax syntax in root.DescendantNodes().OfType<ClassDeclarationSyntax>())
+            {
+                ClassDeclarationSyntax testClass = CreateTestClass(syntax.Identifier.ValueText);
+                IEnumerable<MethodDeclarationSyntax> methods = syntax.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                    .Where(method => method.Modifiers.Any(SyntaxKind.PublicKeyword));
+                foreach (MethodDeclarationSyntax method in methods)
+                {
+                    testClass = testClass.AddMembers(CreateTestMethod(method.Identifier.ValueText));
+                }
 
+                CompilationUnitSyntax unit = CompilationUnit().WithUsings(GetImports())
+                    .AddMembers(NamespaceDeclaration(ParseName("Tests")).AddMembers(testClass));
+                list.Add(new TestUnit($"{syntax.Identifier.ValueText}Tests.cs",
+                    unit.NormalizeWhitespace().ToFullString()));
+            }
 
 
 
