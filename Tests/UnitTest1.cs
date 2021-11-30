@@ -32,5 +32,13 @@ namespace Tests
 
 
 
+        [TestMethod]
+        public void FilesAmountTest()
+        {
+            Assert.AreEqual(4, _roots.Count, "Неверное количество созданных файлов: "+_roots.Count);
+        }
+
+
+
     }
 }
