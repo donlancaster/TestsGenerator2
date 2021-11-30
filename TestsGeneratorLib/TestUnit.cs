@@ -8,11 +8,11 @@ namespace TestsGeneratorLib
 {
    public  class TestUnit
     {
-        public string FilePath { get; }
+        public string FileName { get; }
         public string Source { get; }
         public TestUnit (string filePath, string source)
         {
-            FilePath = filePath;
+            FileName = filePath;
             Source = source;
         }
     }
